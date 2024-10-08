@@ -36,6 +36,46 @@
             margin: 15px 0;
         }
 
+
+        /* Info Chip Styles */
+        .info-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: #2e2e2e;
+            color: #f0f0f0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .info-chip i {
+            margin-right: 8px;
+        }
+
+        /* Leaderboard Position Colors */
+        .info-chip.gold {
+            background-color: gold;
+            color: #000;
+        }
+
+        .info-chip.silver {
+            background-color: silver;
+            color: #000;
+        }
+
+        .info-chip.bronze {
+            background-color: #cd7f32;
+            color: #fff;
+        }
+
+        .info-chip.orange {
+            background-color: #ff8c00;
+            color: #fff;
+        }
+
         /* Style the filter chips */
         .filter-chip {
             display: inline-block;
@@ -562,8 +602,10 @@
     <!-- User Menu Frame -->
     <div id="userMenuFrame" class="frame">
         <h2 id="userMenuLabel"></h2>
-        <p id="userPointsLabel" style="text-align: center;"></p>
-        <p id="winStreakLabel" style="text-align: center;"></p>
+        <div class="chip-container">
+            <div id="userPointsChip" class="info-chip"></div>
+            <div id="winStreakChip" class="info-chip"></div>
+        </div>
         <button class="btn" onclick="startNewGame()">Start New Game</button>
         <button class="btn" onclick="showPastScores()">View Past Scores</button>
         <button class="btn" onclick="showLeaderboard(currentUser, true)">View Leaderboard</button>
@@ -1042,25 +1084,27 @@
                 }
             }
 
-            var pointsColor = '#f0f0f0';
+            // Determine the class for the points chip based on leaderboard position
+            var pointsClass = 'default';
             if (position === 1) {
-                pointsColor = 'gold';
+                pointsClass = 'gold';
             } else if (position === 2) {
-                pointsColor = 'silver';
+                pointsClass = 'silver';
             } else if (position === 3) {
-                pointsColor = 'orange';
+                pointsClass = 'bronze';
             }
 
             var winStreak = winStreaks[currentUser] || 0;
-            var winStreakText = 'Win Streak: ' + winStreak + ' 🔥';
 
             document.getElementById('userMenuLabel').textContent = currentUser + "'s User Menu";
-            var userPointsLabel = document.getElementById('userPointsLabel');
-            userPointsLabel.textContent = 'Total Points: ' + formatScore(totalScore);
-            userPointsLabel.style.color = pointsColor;
 
-            document.getElementById('winStreakLabel').textContent = winStreakText;
-            document.getElementById('winStreakLabel').style.color = '#ff006e';
+            var userPointsChip = document.getElementById('userPointsChip');
+            userPointsChip.innerHTML = '<i class="fas fa-star"></i> Total Points: ' + formatScore(totalScore);
+            userPointsChip.className = 'info-chip ' + pointsClass;
+
+            var winStreakChip = document.getElementById('winStreakChip');
+            winStreakChip.innerHTML = '<i class="fas fa-fire"></i> Win Streak: ' + winStreak;
+            winStreakChip.className = 'info-chip orange';
 
             switchFrame('userMenuFrame');
         }
