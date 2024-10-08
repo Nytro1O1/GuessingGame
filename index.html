@@ -76,6 +76,82 @@
             color: #fff;
         }
 
+        /* Difficulty Colors */
+        .info-chip.green {
+            background-color: #06d6a0;
+            color: #fff;
+        }
+
+        .info-chip.yellow {
+            background-color: #ffd166;
+            color: #000;
+        }
+
+        .info-chip.red {
+            background-color: #ff006e;
+            color: #fff;
+        }
+
+        .info-chip.purple {
+            background-color: #8338ec;
+            color: #fff;
+        }
+
+        /* Points Earned Colors */
+        .info-chip.points-high {
+            background-color: #06d6a0;
+            /* Green for high points */
+            color: #fff;
+        }
+
+        .info-chip.points-medium {
+            background-color: #ffd166;
+            /* Yellow for medium points */
+            color: #000;
+        }
+
+        .info-chip.points-low {
+            background-color: #ff8c00;
+            /* Orange for low points */
+            color: #fff;
+        }
+
+        /* Leaderboard Position Colors */
+        .info-chip.top-rank {
+            background-color: gold;
+            /* Gold for top ranks */
+            color: #000;
+        }
+
+        .info-chip.mid-rank {
+            background-color: silver;
+            /* Silver for mid ranks (e.g., positions 4-10) */
+            color: #000;
+        }
+
+        .info-chip.low-rank {
+            background-color: #cd7f32;
+            /* Bronze-like color for lower ranks (positions 11 and beyond) */
+            color: #fff;
+        }
+
+        .info-chip.default {
+            background-color: #2e2e2e;
+            /* Default for Normal */
+            color: #f0f0f0;
+        }
+
+        .info-chip span {
+            margin-left: 4px;
+            /* Adjust as needed */
+        }
+
+        /* Animated Number Styles */
+        .animated-number {
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
         /* Style the filter chips */
         .filter-chip {
             display: inline-block;
@@ -721,7 +797,7 @@
     <div id="finalStatsFrame" class="frame">
         <h2>Score Report</h2>
         <div id="finalStatsContent">
-            <!-- Final stats content will be injected here -->
+            <!-- Final stats chips will be injected here -->
         </div>
         <div id="finalStatsMessageContainer" style="text-align: center;">
             <div id="penaltyNote" class="message-box hidden"></div>
@@ -1388,8 +1464,9 @@
 
         // Final Stats Screen
         function showFinalStatsScreen() {
-            winstreakMultiplierApplied = Math.max(winStreaks[currentUser], 0);
+            winstreakMultiplierApplied = Math.max(winStreaks[currentUser], 1);
             switchFrame('finalStatsFrame');
+
             var finalStatsContent = document.getElementById('finalStatsContent');
             finalStatsContent.innerHTML = '';
 
@@ -1430,22 +1507,102 @@
                 }
             }
 
-            var content = '<p><strong>1. Difficulty:</strong> <span style="color:#3a86ff;">' + difficulty + '</span></p>';
-            content += '<p><strong>2. Points Earned:</strong> <span style="color:#06d6a0;">' + formatScore(legion) + '</span></p>';
-            content += '<p><strong>3. Total Points:</strong> <span style="color:#06d6a0;">' + formatScore(totalPoints) + '</span></p>';
-            content += '<p><strong>4. Leaderboard Position:</strong> <span style="color:gold;">' + position + '</span></p>';
+            // Determine the class for the points chip based on leaderboard position
+            var pointsClass = 'default';
+            if (position === 1) {
+                pointsClass = 'gold';
+            } else if (position === 2) {
+                pointsClass = 'silver';
+            } else if (position === 3) {
+                pointsClass = 'bronze';
+            }
+
+            // Determine the class for the difficulty chip based on difficulty
+            var difficultyClass = '';
+            switch (difficulty) {
+                case 'Easy':
+                    difficultyClass = 'green';
+                    break;
+                case 'Normal':
+                    difficultyClass = 'default';
+                    break;
+                case 'Difficult':
+                    difficultyClass = 'yellow';
+                    break;
+                case 'Hell':
+                    difficultyClass = 'red';
+                    break;
+                case 'Godly':
+                    difficultyClass = 'purple';
+                    break;
+            }
+
+            // Determine the class for the Points Earned chip based on score range
+            var pointsEarnedClass = '';
+            if (legion > 1000) {
+                pointsEarnedClass = 'points-high';
+            } else if (legion > 500) {
+                pointsEarnedClass = 'points-medium';
+            } else {
+                pointsEarnedClass = 'points-low';
+            }
+
+            // Determine the class for the Leaderboard Position chip based on the position
+            var positionClass = '';
+            if (position === 1) {
+                positionClass = 'gold';
+            } else if (position === 2) {
+                positionClass = 'silver';
+            } else if (position === 3) {
+                positionClass = 'bronze';
+            } else {
+                positionClass = 'default';
+            }
 
             var currentWinstreak = winStreaks[currentUser] || 0;
-            content += '<p><strong>5. Win Streak:</strong> <span style="color:#ff006e;">' + currentWinstreak + ' 🔥</span></p>';
+
+            // Create chips for the final stats
+            var content = '<div class="chip-container">';
+
+            // Difficulty Chip
+            content += `<div class="info-chip ${difficultyClass}">`;
+            content += '<i class="fas fa-tachometer-alt"></i> Difficulty: <span>' + difficulty + '</span>';
+            content += '</div>';
+
+            // Points Earned Chip with animated number
+            content += `<div class="info-chip ${pointsEarnedClass}">`;
+            content += '<i class="fas fa-plus-circle"></i> Points Earned: <span class="animated-number" data-target="' + legion + '">0</span>';
+            content += '</div>';
+
+            // Total Points Chip
+            content += `<div class="info-chip ${pointsClass}">`;
+            content += '<i class="fas fa-star"></i> Total Points: <span class="animated-number" data-target="' + totalPoints + '">0</span>';
+            content += '</div>';
+
+            // Leaderboard Position Chip
+            content += `<div class="info-chip ${positionClass}">`;
+            content += '<i class="fas fa-trophy"></i> Leaderboard Position: <span class="animated-number" data-target="' + position + '">0</span>';
+            content += '</div>';
+
+            // Win Streak Chip
+            content += '<div class="info-chip orange">';
+            content += '<i class="fas fa-fire"></i> Win Streak: <span class="animated-number" data-target="' + currentWinstreak + '">0</span>';
+            content += '</div>';
+
+            content += '</div>'; // Close chip-container
+
+            finalStatsContent.innerHTML = content;
+
+            // Start the number animations
+            animateNumbers();
+
+            // Show or hide penalty and multiplier notes
             var penaltyNote = document.getElementById('penaltyNote');
             var multiplierNote = document.getElementById('multiplierNote');
 
             // Reset notes
-            penaltyNote.classList.remove('red', 'green', 'hidden');
-            penaltyNote.classList.add('message-box', 'hidden');
-
-            multiplierNote.classList.remove('red', 'green', 'hidden');
-            multiplierNote.classList.add('message-box', 'hidden');
+            penaltyNote.className = 'message-box hidden';
+            multiplierNote.className = 'message-box hidden';
 
             // Check if a 50% point penalty was applied
             if (pointsPenaltyFactor === 0.5) {
@@ -1460,7 +1617,28 @@
                 multiplierNote.classList.remove('hidden');
                 multiplierNote.classList.add('green');
             }
-            finalStatsContent.innerHTML = content;
+        }
+
+        // Function to animate numbers
+        function animateNumbers() {
+            var animatedNumbers = document.querySelectorAll('.animated-number');
+            animatedNumbers.forEach(function (el) {
+                var target = +el.getAttribute('data-target');
+                var count = 0;
+                var increment = target / 100; // Adjust the speed here
+                var speed = 15; // Adjust the animation speed here (lower is faster)
+
+                function updateNumber() {
+                    count += increment;
+                    if (count >= target) {
+                        el.textContent = formatScore(target);
+                    } else {
+                        el.textContent = formatScore(Math.floor(count));
+                        setTimeout(updateNumber, speed);
+                    }
+                }
+                updateNumber();
+            });
         }
 
         // Switch Back to Menu
