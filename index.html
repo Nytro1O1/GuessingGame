@@ -76,6 +76,12 @@
             color: #fff;
         }
 
+        .info-chip.normal {
+            background-color: #3a86ff;
+            /* Blue */
+            color: #fff;
+        }
+
         /* Difficulty Colors */
         .info-chip.green {
             background-color: #06d6a0;
@@ -1524,7 +1530,7 @@
                     difficultyClass = 'green';
                     break;
                 case 'Normal':
-                    difficultyClass = 'default';
+                    difficultyClass = 'normal';
                     break;
                 case 'Difficult':
                     difficultyClass = 'yellow';
@@ -1739,6 +1745,7 @@
                 }
                 allScores.push({ user: user, score: userTotal });
             }
+
             // Sort and assign original ranks
             allScores.sort(function (a, b) {
                 return b.score - a.score;
@@ -1749,39 +1756,34 @@
                 allScores[i].originalRank = i + 1;
             }
 
-            // Apply search term filter
-            if (searchTerm) {
-                var searchRegex = new RegExp(searchTerm, 'i');
-                allScores = allScores.filter(function (entry) {
-                    return searchRegex.test(entry.user) || searchRegex.test(entry.score.toString());
-                });
-            }
-
-            // Display the leaderboard entries using original ranks
-            for (var i = 0; i < allScores.length; i++) {
-                var entry = allScores[i];
+            // Display the leaderboard up to 100 entries
+            for (var rank = 1; rank <= 100; rank++) {
+                var entry = allScores[rank - 1]; // Adjust for zero-based index
                 var row = leaderboardTable.insertRow();
                 var cell1 = row.insertCell(0); // Rank
                 var cell2 = row.insertCell(1); // User
                 var cell3 = row.insertCell(2); // Points
 
-                cell1.textContent = entry.originalRank;
-                cell2.textContent = entry.user;
-                cell3.textContent = formatScore(entry.score);
+                cell1.textContent = rank;
 
-                // Apply color coding based on original rank
-                if (entry.originalRank === 1) {
-                    // First place
-                    row.style.color = 'gold';
-                } else if (entry.originalRank === 2) {
-                    // Second place
-                    row.style.color = 'silver';
-                } else if (entry.originalRank === 3) {
-                    // Third place
-                    row.style.color = '#cd7f32'; // Bronze color
+                if (entry) {
+                    cell2.textContent = entry.user;
+                    cell3.textContent = formatScore(entry.score);
+
+                    // Apply color coding based on original rank
+                    if (entry.originalRank === 1) {
+                        row.style.color = 'gold';
+                    } else if (entry.originalRank === 2) {
+                        row.style.color = 'silver';
+                    } else if (entry.originalRank === 3) {
+                        row.style.color = '#cd7f32'; // Bronze color
+                    } else {
+                        row.style.color = '#f0f0f0'; // Default text color for other ranks
+                    }
                 } else {
-                    // Other positions
-                    row.style.color = '#f0f0f0'; // Default text color
+                    cell2.textContent = '-';
+                    cell3.textContent = '-';
+                    row.style.color = '#f0f0f0'; // Default text color for empty ranks
                 }
             }
 
